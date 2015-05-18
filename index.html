@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Biometria Lista 8 - Exercício 1  by ThaGodoy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Biometria Lista 8 - Exercício 1 </h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/ThaGodoy/exerciciolista8" class="btn">View on GitHub</a>
+      <a href="https://github.com/ThaGodoy/exerciciolista8/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/ThaGodoy/exerciciolista8/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p><strong>EXERCÍCIO BIOMETRIA - LISTA 8</strong></p>
+
+<p><strong>Aluna: Thaís Fernanda Godoy</strong></p>
+
+<p>1) Para reforçar os conceitos apresentados em aula, faça mapeamento de QTLs para o conjunto de dados MAIZE DATA usando análise de cada marcador (single marker analysis). Use apenas funções do R base, ou seja, não carregue nenhum pacote. Apresente os resultados (incluindo os códigos) considerando que o mapa genético já foi estimado.</p>
+
+<p>Os códigos utilizados no RStudio foram os seguintes:</p>
+
+<ul>
+<li>Abrir dados maize </li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>maize<span class="pl-k">&lt;-</span>read.csv(<span class="pl-s"><span class="pl-pds">"</span>http://dl.dropbox.com/u/1968009/maize.csv<span class="pl-pds">"</span></span>)</pre></div>
+
+<hr>
+
+<ul>
+<li>regressão linear para calcular o efeito aditivo, calculando a diferença entre os homozigotos e o heterozigoto é a média dos homozigostos</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>testeF<span class="pl-k">&lt;-</span> vector (<span class="pl-s"><span class="pl-pds">"</span>numeric<span class="pl-pds">"</span></span>,<span class="pl-c1">12</span>) 
+     <span class="pl-k">for</span>(i <span class="pl-k">in</span> <span class="pl-c1">3</span><span class="pl-k">:</span><span class="pl-c1">14</span>) { 
+     model<span class="pl-k">&lt;-</span>summary(lm(maize[,<span class="pl-c1">2</span>]<span class="pl-k">~</span>maize[,i])) 
+     print (model)
+     testeF[i<span class="pl-k">-</span><span class="pl-c1">2</span>] <span class="pl-k">&lt;-</span>model$fstatistic[<span class="pl-c1">1</span>]
+     }</pre></div>
+
+<hr>
+
+<ul>
+<li>Incluí o efeito de dominância no modelo para ver se tem desvios de dominância:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>testeF<span class="pl-k">&lt;-</span> vector (<span class="pl-s"><span class="pl-pds">"</span>numeric<span class="pl-pds">"</span></span>,<span class="pl-c1">12</span>) #criar um vetor numérico para <span class="pl-c1">12</span> marcadores
+     <span class="pl-k">for</span>(j <span class="pl-k">in</span> <span class="pl-c1">3</span><span class="pl-k">:</span><span class="pl-c1">14</span>) { 
+     model1<span class="pl-k">&lt;-</span>summary(lm(maize[,<span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[,j])))   
+     print (model1)
+     testeF[j<span class="pl-k">-</span><span class="pl-c1">2</span>] <span class="pl-k">&lt;-</span>model1$fstatistic[<span class="pl-c1">1</span>]
+     }</pre></div>
+
+<hr>
+
+<ul>
+<li>Os valores do teste F para todos os marcadores pelo comando:</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>testeF</pre></div>
+
+<hr>
+
+<ul>
+<li>Usando os valores de recombinação gero um vetor com as distâncias cumulativas entre os marcadores</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>mapa<span class="pl-k">&lt;-</span> <span class="pl-c1">100</span><span class="pl-k">*</span>c(<span class="pl-c1">0.0</span>, <span class="pl-c1">0.357</span>, <span class="pl-c1">0.117</span>, <span class="pl-c1">0.11</span>, <span class="pl-c1">0.024</span>, <span class="pl-c1">0.222</span>, <span class="pl-c1">0.080</span>, <span class="pl-c1">0.134</span>, <span class="pl-c1">0.057</span>, <span class="pl-c1">0.215</span>, <span class="pl-c1">0.058</span>, <span class="pl-c1">0.086</span>)
+    cM<span class="pl-k">&lt;-</span>cumsum(mapa) #estou multiplicando os valores de <span class="pl-s"><span class="pl-pds">"</span>M<span class="pl-pds">"</span></span> (Morgan), por <span class="pl-c1">100</span> (cM)</pre></div>
+
+<hr>
+
+<ul>
+<li>gráfico dos valores de F e as distâncias entre os marcadores</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>plot(cM,testeF)</pre></div>
+
+<p><strong>RESULTADOS</strong></p>
+
+<p><strong>Efeito aditivo de cada marcador:</strong></p>
+
+<ul>
+<li>M1</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">2.7869</span> <span class="pl-k">-</span><span class="pl-c1">1.2869</span> <span class="pl-k">-</span><span class="pl-c1">0.4068</span>  <span class="pl-c1">1.2782</span>  <span class="pl-c1">4.0932</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">3.1568</span>     <span class="pl-c1">0.2210</span>   <span class="pl-c1">14.29</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]    <span class="pl-c1">1.0650</span>     <span class="pl-c1">0.1799</span>    <span class="pl-c1">5.92</span> <span class="pl-c1">1.75e-08</span> <span class="pl-k">***</span>
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.659</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.1717</span>,    Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.1668</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">35.04</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">1.751e-08</span></pre></div>
+
+<ul>
+<li>M2</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.5664</span> <span class="pl-k">-</span><span class="pl-c1">1.4256</span> <span class="pl-k">-</span><span class="pl-c1">0.3164</span>  <span class="pl-c1">1.3244</span>  <span class="pl-c1">4.0744</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">3.5349</span>     <span class="pl-c1">0.2520</span>  <span class="pl-c1">14.026</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]    <span class="pl-c1">0.6407</span>     <span class="pl-c1">0.1966</span>   <span class="pl-c1">3.259</span>  <span class="pl-c1">0.00135</span> <span class="pl-k">**</span> 
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.768</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.05913</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.05357</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">10.62</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.001351</span></pre></div>
+
+<ul>
+<li>M3</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.6842</span> <span class="pl-k">-</span><span class="pl-c1">1.4568</span> <span class="pl-k">-</span><span class="pl-c1">0.2068</span>  <span class="pl-c1">1.2932</span>  <span class="pl-c1">4.0432</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">3.4794</span>     <span class="pl-c1">0.2435</span>  <span class="pl-c1">14.290</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]    <span class="pl-c1">0.7274</span>     <span class="pl-c1">0.1975</span>   <span class="pl-c1">3.684</span> <span class="pl-c1">0.000309</span> <span class="pl-k">***</span>
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.753</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.07433</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.06885</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">13.57</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.0003091</span></pre></div>
+
+<ul>
+<li>M4</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.2097</span> <span class="pl-k">-</span><span class="pl-c1">1.4597</span> <span class="pl-k">-</span><span class="pl-c1">0.2196</span>  <span class="pl-c1">1.4054</span>  <span class="pl-c1">4.0304</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">3.9796</span>     <span class="pl-c1">0.2498</span>  <span class="pl-c1">15.930</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]    <span class="pl-c1">0.2400</span>     <span class="pl-c1">0.2007</span>   <span class="pl-c1">1.196</span>    <span class="pl-c1">0.233</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.815</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.008394</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.002527</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">1.431</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.2333</span></pre></div>
+
+<ul>
+<li>M5</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3022</span> <span class="pl-k">-</span><span class="pl-c1">1.4742</span> <span class="pl-k">-</span><span class="pl-c1">0.2242</span>  <span class="pl-c1">1.4008</span>  <span class="pl-c1">4.0258</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">3.8962</span>     <span class="pl-c1">0.2428</span>  <span class="pl-c1">16.048</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]    <span class="pl-c1">0.3280</span>     <span class="pl-c1">0.1973</span>   <span class="pl-c1">1.663</span>   <span class="pl-c1">0.0982</span> .  
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.808</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.01609</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.01027</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">2.764</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.09824</span></pre></div>
+
+<ul>
+<li>M6</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.1387</span> <span class="pl-k">-</span><span class="pl-c1">1.3887</span> <span class="pl-k">-</span><span class="pl-c1">0.2291</span>  <span class="pl-c1">1.3959</span>  <span class="pl-c1">4.1113</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)  <span class="pl-c1">4.13869</span>    <span class="pl-c1">0.23713</span>  <span class="pl-c1">17.453</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]   <span class="pl-c1">0.09043</span>    <span class="pl-c1">0.19418</span>   <span class="pl-c1">0.466</span>    <span class="pl-c1">0.642</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.821</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.001282</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.004628</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.2169</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.642</span></pre></div>
+
+<ul>
+<li>M7</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3076</span> <span class="pl-k">-</span><span class="pl-c1">1.4781</span> <span class="pl-k">-</span><span class="pl-c1">0.3076</span>  <span class="pl-c1">1.3969</span>  <span class="pl-c1">4.1015</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)  <span class="pl-c1">4.30762</span>    <span class="pl-c1">0.23898</span>   <span class="pl-c1">18.02</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]  <span class="pl-k">-</span><span class="pl-c1">0.07955</span>    <span class="pl-c1">0.19419</span>   <span class="pl-k">-</span><span class="pl-c1">0.41</span>    <span class="pl-c1">0.683</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.822</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.0009919</span>, Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.004919</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.1678</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.6826</span></pre></div>
+
+<ul>
+<li>M8</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.2100</span> <span class="pl-k">-</span><span class="pl-c1">1.4777</span> <span class="pl-k">-</span><span class="pl-c1">0.2277</span>  <span class="pl-c1">1.3973</span>  <span class="pl-c1">4.0400</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)  <span class="pl-c1">4.21000</span>    <span class="pl-c1">0.24107</span>  <span class="pl-c1">17.464</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]   <span class="pl-c1">0.01766</span>    <span class="pl-c1">0.19221</span>   <span class="pl-c1">0.092</span>    <span class="pl-c1">0.927</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.822</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">4.995e-05</span>, Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.005867</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.008442</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.9269</span></pre></div>
+
+<ul>
+<li>M9</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+   Min     1Q Median     3Q    Max 
+<span class="pl-k">-</span><span class="pl-c1">3.304</span> <span class="pl-k">-</span><span class="pl-c1">1.438</span> <span class="pl-k">-</span><span class="pl-c1">0.304</span>  <span class="pl-c1">1.398</span>  <span class="pl-c1">4.101</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)  <span class="pl-c1">4.30401</span>    <span class="pl-c1">0.23899</span>  <span class="pl-c1">18.009</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]  <span class="pl-k">-</span><span class="pl-c1">0.07729</span>    <span class="pl-c1">0.19765</span>  <span class="pl-k">-</span><span class="pl-c1">0.391</span>    <span class="pl-c1">0.696</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.822</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.000904</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.005008</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.1529</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.6963</span></pre></div>
+
+<ul>
+<li>M10</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.4355</span> <span class="pl-k">-</span><span class="pl-c1">1.4586</span> <span class="pl-k">-</span><span class="pl-c1">0.2778</span>  <span class="pl-c1">1.4722</span>  <span class="pl-c1">4.0184</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">4.4355</span>     <span class="pl-c1">0.2525</span>  <span class="pl-c1">17.566</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]   <span class="pl-k">-</span><span class="pl-c1">0.2038</span>     <span class="pl-c1">0.2072</span>  <span class="pl-k">-</span><span class="pl-c1">0.984</span>    <span class="pl-c1">0.327</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.817</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.005695</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.0001885</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.968</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.3266</span></pre></div>
+
+<ul>
+<li>M11</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.2996</span> <span class="pl-k">-</span><span class="pl-c1">1.4813</span> <span class="pl-k">-</span><span class="pl-c1">0.2996</span>  <span class="pl-c1">1.3937</span>  <span class="pl-c1">4.0870</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)  <span class="pl-c1">4.29956</span>    <span class="pl-c1">0.25293</span>  <span class="pl-c1">16.999</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]  <span class="pl-k">-</span><span class="pl-c1">0.06829</span>    <span class="pl-c1">0.20166</span>  <span class="pl-k">-</span><span class="pl-c1">0.339</span>    <span class="pl-c1">0.735</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.822</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.0006782</span>, Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.005235</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.1147</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.7353</span></pre></div>
+
+<ul>
+<li>M12</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> maize[, i])
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.4135</span> <span class="pl-k">-</span><span class="pl-c1">1.4489</span> <span class="pl-k">-</span><span class="pl-c1">0.3052</span>  <span class="pl-c1">1.3906</span>  <span class="pl-c1">4.1948</span> 
+
+Coefficients<span class="pl-k">:</span>
+            Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)   <span class="pl-c1">4.4135</span>     <span class="pl-c1">0.2462</span>  <span class="pl-c1">17.927</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+maize[, i]   <span class="pl-k">-</span><span class="pl-c1">0.1791</span>     <span class="pl-c1">0.1963</span>  <span class="pl-k">-</span><span class="pl-c1">0.913</span>    <span class="pl-c1">0.363</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.818</span> on <span class="pl-c1">169</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.004904</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.0009837</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.8329</span> on <span class="pl-c1">1</span> and <span class="pl-c1">169</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.3627</span></pre></div>
+
+<p><strong>Para a característica GY, foi verificada a presença de QTL com efeito aditivo significativo (P&lt;0.05) apenas para os primeiros três marcadores (M1, M2, M3).</strong></p>
+
+<p><strong>Efeito dominante de cada marcador:</strong></p>
+
+<ul>
+<li>M1 </li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">2.7384</span> <span class="pl-k">-</span><span class="pl-c1">1.2703</span> <span class="pl-k">-</span><span class="pl-c1">0.3571</span>  <span class="pl-c1">1.2297</span>  <span class="pl-c1">4.1429</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">3.1071</span>     <span class="pl-c1">0.2566</span>  <span class="pl-c1">12.110</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>   <span class="pl-c1">1.1632</span>     <span class="pl-c1">0.3130</span>   <span class="pl-c1">3.716</span> <span class="pl-c1">0.000275</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">2.1312</span>     <span class="pl-c1">0.3608</span>   <span class="pl-c1">5.908</span> <span class="pl-c1">1.88e-08</span> <span class="pl-k">***</span>
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.663</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.1725</span>,    Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.1626</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">17.51</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">1.241e-07</span></pre></div>
+
+<ul>
+<li>M2</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.5729</span> <span class="pl-k">-</span><span class="pl-c1">1.4185</span> <span class="pl-k">-</span><span class="pl-c1">0.3229</span>  <span class="pl-c1">1.3315</span>  <span class="pl-c1">4.0815</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">3.5441</span>     <span class="pl-c1">0.3041</span>  <span class="pl-c1">11.655</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>   <span class="pl-c1">0.6244</span>     <span class="pl-c1">0.3575</span>   <span class="pl-c1">1.747</span>  <span class="pl-c1">0.08250</span> .  
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">1.2788</span>     <span class="pl-c1">0.3974</span>   <span class="pl-c1">3.218</span>  <span class="pl-c1">0.00155</span> <span class="pl-k">**</span> 
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.773</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.05915</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.04795</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">5.281</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.005966</span></pre></div>
+
+<ul>
+<li>M3</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.7619</span> <span class="pl-k">-</span><span class="pl-c1">1.3859</span> <span class="pl-k">-</span><span class="pl-c1">0.2619</span>  <span class="pl-c1">1.3641</span>  <span class="pl-c1">4.1141</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">3.5676</span>     <span class="pl-c1">0.2888</span>  <span class="pl-c1">12.351</span>  <span class="pl-k">&lt;</span> <span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>   <span class="pl-c1">0.5683</span>     <span class="pl-c1">0.3420</span>   <span class="pl-c1">1.662</span> <span class="pl-c1">0.098473</span> .  
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">1.4443</span>     <span class="pl-c1">0.3962</span>   <span class="pl-c1">3.646</span> <span class="pl-c1">0.000355</span> <span class="pl-k">***</span>
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.757</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.07612</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.06512</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">6.921</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.001294</span></pre></div>
+
+<ul>
+<li>M4</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.2159</span> <span class="pl-k">-</span><span class="pl-c1">1.4635</span> <span class="pl-k">-</span><span class="pl-c1">0.2159</span>  <span class="pl-c1">1.3998</span>  <span class="pl-c1">4.0365</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">3.9868</span>     <span class="pl-c1">0.2953</span>  <span class="pl-c1">13.502</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>   <span class="pl-c1">0.2266</span>     <span class="pl-c1">0.3527</span>   <span class="pl-c1">0.643</span>    <span class="pl-c1">0.521</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">0.4791</span>     <span class="pl-c1">0.4031</span>   <span class="pl-c1">1.188</span>    <span class="pl-c1">0.236</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.82</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.008407</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.003398</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.7122</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.4921</span></pre></div>
+
+<ul>
+<li>M5</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3198</span> <span class="pl-k">-</span><span class="pl-c1">1.4569</span> <span class="pl-k">-</span><span class="pl-c1">0.2069</span>  <span class="pl-c1">1.3828</span>  <span class="pl-c1">4.0431</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">3.9146</span>     <span class="pl-c1">0.2832</span>  <span class="pl-c1">13.825</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>   <span class="pl-c1">0.2923</span>     <span class="pl-c1">0.3435</span>   <span class="pl-c1">0.851</span>   <span class="pl-c1">0.3960</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">0.6551</span>     <span class="pl-c1">0.3958</span>   <span class="pl-c1">1.655</span>   <span class="pl-c1">0.0997</span> .  
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.813</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.01619</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.004476</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">1.382</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.2539</span></pre></div>
+
+<ul>
+<li>M6</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.2944</span> <span class="pl-k">-</span><span class="pl-c1">1.3964</span> <span class="pl-k">-</span><span class="pl-c1">0.2944</span>  <span class="pl-c1">1.3536</span>  <span class="pl-c1">4.1898</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.2944</span>     <span class="pl-c1">0.2712</span>  <span class="pl-c1">15.835</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.2342</span>     <span class="pl-c1">0.3368</span>  <span class="pl-k">-</span><span class="pl-c1">0.695</span>    <span class="pl-c1">0.488</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>   <span class="pl-c1">0.1881</span>     <span class="pl-c1">0.3880</span>   <span class="pl-c1">0.485</span>    <span class="pl-c1">0.628</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.819</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.009479</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.002313</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.8038</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.4493</span></pre></div>
+
+<ul>
+<li>M7</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.4375</span> <span class="pl-k">-</span><span class="pl-c1">1.3404</span> <span class="pl-k">-</span><span class="pl-c1">0.4375</span>  <span class="pl-c1">1.4096</span>  <span class="pl-c1">3.9716</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.4375</span>     <span class="pl-c1">0.2747</span>  <span class="pl-c1">16.155</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.3471</span>     <span class="pl-c1">0.3398</span>  <span class="pl-k">-</span><span class="pl-c1">1.022</span>    <span class="pl-c1">0.308</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-k">-</span><span class="pl-c1">0.1591</span>     <span class="pl-c1">0.3885</span>  <span class="pl-k">-</span><span class="pl-c1">0.410</span>    <span class="pl-c1">0.683</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.822</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.00644</span>,   Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.005388</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.5445</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.5812</span></pre></div>
+
+<ul>
+<li>M8</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3372</span> <span class="pl-k">-</span><span class="pl-c1">1.3521</span> <span class="pl-k">-</span><span class="pl-c1">0.3372</span>  <span class="pl-c1">1.4074</span>  <span class="pl-c1">3.9128</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)             <span class="pl-c1">4.33721</span>    <span class="pl-c1">0.27805</span>  <span class="pl-c1">15.598</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span> <span class="pl-k">-</span><span class="pl-c1">0.24462</span>    <span class="pl-c1">0.34403</span>  <span class="pl-k">-</span><span class="pl-c1">0.711</span>    <span class="pl-c1">0.478</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-c1">0.02449</span>    <span class="pl-c1">0.38477</span>   <span class="pl-c1">0.064</span>    <span class="pl-c1">0.949</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.823</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.005056</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.006789</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.4269</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.6533</span></pre></div>
+
+<ul>
+<li>M9</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3182</span> <span class="pl-k">-</span><span class="pl-c1">1.4384</span> <span class="pl-k">-</span><span class="pl-c1">0.3182</span>  <span class="pl-c1">1.3836</span>  <span class="pl-c1">4.0854</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.3182</span>     <span class="pl-c1">0.2754</span>  <span class="pl-c1">15.677</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.1060</span>     <span class="pl-c1">0.3386</span>  <span class="pl-k">-</span><span class="pl-c1">0.313</span>    <span class="pl-c1">0.755</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-k">-</span><span class="pl-c1">0.1535</span>     <span class="pl-c1">0.3966</span>  <span class="pl-k">-</span><span class="pl-c1">0.387</span>    <span class="pl-c1">0.699</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.827</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.0009689</span>, Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.01092</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.08147</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.9218</span></pre></div>
+
+<ul>
+<li>M10</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.3446</span> <span class="pl-k">-</span><span class="pl-c1">1.3942</span> <span class="pl-k">-</span><span class="pl-c1">0.3032</span>  <span class="pl-c1">1.4468</span>  <span class="pl-c1">3.9468</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.3446</span>     <span class="pl-c1">0.2994</span>  <span class="pl-c1">14.513</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.0414</span>     <span class="pl-c1">0.3534</span>  <span class="pl-k">-</span><span class="pl-c1">0.117</span>    <span class="pl-c1">0.907</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-k">-</span><span class="pl-c1">0.4008</span>     <span class="pl-c1">0.4154</span>  <span class="pl-k">-</span><span class="pl-c1">0.965</span>    <span class="pl-c1">0.336</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.821</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.0076</span>,    Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.004214</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.6433</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.5268</span></pre></div>
+
+<ul>
+<li>M11</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.4054</span> <span class="pl-k">-</span><span class="pl-c1">1.3933</span> <span class="pl-k">-</span><span class="pl-c1">0.3933</span>  <span class="pl-c1">1.3567</span>  <span class="pl-c1">4.1067</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.4054</span>     <span class="pl-c1">0.3000</span>  <span class="pl-c1">14.684</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.2621</span>     <span class="pl-c1">0.3570</span>  <span class="pl-k">-</span><span class="pl-c1">0.734</span>    <span class="pl-c1">0.464</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-k">-</span><span class="pl-c1">0.1554</span>     <span class="pl-c1">0.4050</span>  <span class="pl-k">-</span><span class="pl-c1">0.384</span>    <span class="pl-c1">0.702</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.825</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.003252</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.008614</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.274</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.7606</span></pre></div>
+
+<ul>
+<li>M12</li>
+</ul>
+
+<div class="highlight highlight-javascript"><pre>Call<span class="pl-k">:</span>
+lm(formula <span class="pl-k">=</span> maize[, <span class="pl-c1">2</span>] <span class="pl-k">~</span> as.factor(maize[, j]))
+
+Residuals<span class="pl-k">:</span>
+    Min      1Q  Median      3Q     Max 
+<span class="pl-k">-</span><span class="pl-c1">3.4000</span> <span class="pl-k">-</span><span class="pl-c1">1.4485</span> <span class="pl-k">-</span><span class="pl-c1">0.2935</span>  <span class="pl-c1">1.4033</span>  <span class="pl-c1">4.2065</span> 
+
+Coefficients<span class="pl-k">:</span>
+                       Estimate Std. Error t value Pr(<span class="pl-k">&gt;</span>|t|)    
+(Intercept)              <span class="pl-c1">4.4000</span>     <span class="pl-c1">0.2883</span>  <span class="pl-c1">15.261</span>   <span class="pl-k">&lt;</span><span class="pl-c1">2e-16</span> <span class="pl-k">***</span>
+as.factor(maize[, j])<span class="pl-c1">1</span>  <span class="pl-k">-</span><span class="pl-c1">0.1529</span>     <span class="pl-c1">0.3496</span>  <span class="pl-k">-</span><span class="pl-c1">0.437</span>    <span class="pl-c1">0.662</span>    
+as.factor(maize[, j])<span class="pl-c1">2</span>  <span class="pl-k">-</span><span class="pl-c1">0.3565</span>     <span class="pl-c1">0.3942</span>  <span class="pl-k">-</span><span class="pl-c1">0.904</span>    <span class="pl-c1">0.367</span>    
+<span class="pl-k">---</span>
+Signif. codes<span class="pl-k">:</span>  <span class="pl-c1">0</span> ‘<span class="pl-k">***</span>’ <span class="pl-c1">0.001</span> ‘<span class="pl-k">**</span>’ <span class="pl-c1">0.01</span> ‘<span class="pl-k">*</span>’ <span class="pl-c1">0.05</span> ‘.’ <span class="pl-c1">0.1</span> ‘ ’ <span class="pl-c1">1</span>
+
+Residual standard error<span class="pl-k">:</span> <span class="pl-c1">1.823</span> on <span class="pl-c1">168</span> degrees <span class="pl-k">of</span> freedom
+Multiple R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-c1">0.004953</span>,  Adjusted R<span class="pl-k">-</span>squared<span class="pl-k">:</span>  <span class="pl-k">-</span><span class="pl-c1">0.006893</span> 
+F<span class="pl-k">-</span>statistic<span class="pl-k">:</span> <span class="pl-c1">0.4181</span> on <span class="pl-c1">2</span> and <span class="pl-c1">168</span> DF,  p<span class="pl-k">-</span>value<span class="pl-k">:</span> <span class="pl-c1">0.659</span></pre></div>
+
+<p><strong>Para a característica GY, foi verificada a presença de QTL com efeito de dominância significativo (P&lt;0.05) apenas para os primeiros três marcadores (M1, M2, M3). Sendo assim, os 3 primeiros marcadores apresentam efeito aditivo com desvios de dominância.</strong></p>
+
+<p><strong>Valores do teste F</strong></p>
+
+<div class="highlight highlight-javascript"><pre>testeF
+ [<span class="pl-c1">1</span>] <span class="pl-c1">17.5067603</span>  <span class="pl-c1">5.2810664</span>  <span class="pl-c1">6.9205730</span>  <span class="pl-c1">0.7121516</span>  <span class="pl-c1">1.3822075</span>  <span class="pl-c1">0.8038331</span>  <span class="pl-c1">0.5445016</span>
+ [<span class="pl-c1">8</span>]  <span class="pl-c1">0.4268571</span>  <span class="pl-c1">0.0814683</span>  <span class="pl-c1">0.6432987</span>  <span class="pl-c1">0.2740384</span>  <span class="pl-c1">0.4181324</span></pre></div>
+
+<p><strong>Gráfico da distância dos marcadores em cM relacionadas com o teste F</strong></p>
+
+<p><img src="https://cloud.githubusercontent.com/assets/12297507/7689927/37ce75a6-fd86-11e4-9de9-2acfe6b784b7.jpeg" alt="Gráfico"></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/ThaGodoy/exerciciolista8">Biometria Lista 8 - Exercício 1 </a> is maintained by <a href="https://github.com/ThaGodoy">ThaGodoy</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
